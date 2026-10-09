@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import "./index.css";
 
 /* ================= Tipos ================= */
@@ -172,6 +172,48 @@ function ProductCard({ p, c, wide }: { p: Product; c: Ctx; wide?: boolean }) {
   );
 }
 
+function PromoCarousel({ products, c }: { products: Product[]; c: Ctx }) {
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [canPrev, setCanPrev] = useState(false);
+  const [canNext, setCanNext] = useState(products.length > 1);
+
+  const move = (direction: -1 | 1) => {
+    const track = trackRef.current;
+    if (!track) return;
+    track.scrollBy({ left: direction * track.clientWidth * 0.82, behavior: "smooth" });
+  };
+
+  return (
+    <section className="block promo-block" aria-label="Promoções verificadas">
+      <div className="promo-heading">
+        <h2>🔥 Promoções verificadas</h2>
+        <div className="promo-controls" aria-label="Navegação das promoções">
+          <button type="button" onClick={() => move(-1)} disabled={!canPrev} aria-label="Promoção anterior">
+            <span aria-hidden="true">‹</span>
+          </button>
+          <button type="button" onClick={() => move(1)} disabled={!canNext} aria-label="Próxima promoção">
+            <span aria-hidden="true">›</span>
+          </button>
+        </div>
+      </div>
+      <div
+        ref={trackRef}
+        className="hscroll promo-track"
+        role="region"
+        aria-label="Carrossel de promoções. Deslize para ver mais produtos."
+        tabIndex={0}
+        onScroll={(event) => {
+          const track = event.currentTarget;
+          setCanPrev(track.scrollLeft > 4);
+          setCanNext(track.scrollLeft + track.clientWidth < track.scrollWidth - 4);
+        }}
+      >
+        {products.map((p) => <ProductCard key={p.id} p={p} c={c} />)}
+      </div>
+    </section>
+  );
+}
+
 function ImageCarousel({ slides, variant }: { slides: BannerSlide[]; variant: "home" | "community" }) {
   const [active, setActive] = useState(0);
   useEffect(() => {
@@ -212,10 +254,7 @@ function Home({ c }: { c: Ctx }) {
       <ImageCarousel slides={HOME_SLIDES} variant="home" />
       <div className="chips">{CATS.map((k) => <button key={k} className={cat === k ? "chip on" : "chip"} onClick={() => setCat(k)}>{CAT_EMOJI[k]} {k}</button>)}</div>
       {!q && cat === "Todos" && (
-        <section className="block">
-          <h2>🔥 Promoções verificadas</h2>
-          <div className="hscroll">{promos.map((p) => <ProductCard key={p.id} p={p} c={c} />)}</div>
-        </section>
+        <PromoCarousel products={promos} c={c} />
       )}
       <section className="block">
         <h2>{q || cat !== "Todos" ? `Resultados (${list.length})` : "Tendências seguras"}</h2>

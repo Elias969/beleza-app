@@ -268,3 +268,18 @@ body{background:#532b33}
 
 @media(max-width:380px){.image-carousel{min-height:178px;margin-right:14px;margin-left:14px}.carousel-copy{max-width:86%;padding:22px 19px 38px}.carousel-copy h2{font-size:19px}.carousel-arrow{width:25px;height:25px}.beauty-score{padding:13px}.login-decoration-left{left:-58px}.login-decoration-right{right:-90px}}
 @media(prefers-reduced-motion:reduce){.carousel-image{animation:none!important}.beauty-score-track span{transition:none!important}}
+
+/* Carrossel de promoções: cards largos, sem encolhimento lateral */
+.hscroll>.product-card:not(.wide){flex:0 0 178px;min-width:178px;max-width:178px}
+.promo-block{margin-top:24px}
+.promo-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 20px 12px}
+.promo-heading h2{margin:0;color:#2e2528;font-family:"Poppins:Medium",Poppins,sans-serif;font-size:18px;line-height:1.25}
+.promo-controls{display:flex;flex:none;gap:7px}
+.promo-controls button{width:34px;height:34px;display:grid;place-items:center;padding:0;border:1px solid #ead2d2;border-radius:50%;background:rgba(255,255,255,.88);color:#532b33;font-family:Arial,sans-serif;font-size:27px;line-height:1;box-shadow:0 3px 10px rgba(83,43,51,.08);transition:background .2s,color .2s,transform .2s,opacity .2s}
+.promo-controls button:hover:not(:disabled){transform:translateY(-1px);background:#a84f60;color:#fff}
+.promo-controls button:disabled{opacity:.38;cursor:not-allowed;box-shadow:none}
+.promo-controls button:focus-visible,.promo-track:focus-visible{outline:3px solid rgba(168,79,96,.45);outline-offset:3px}
+.promo-track{gap:14px;padding:4px 20px 20px;scroll-padding-inline:20px;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+.promo-track>.product-card{flex:0 0 min(84%,300px);width:min(84%,300px);min-width:min(84%,300px);max-width:300px;border-radius:21px}
+.promo-track>.product-card .pimg{height:176px}
+@media(max-width:380px){.promo-track>.product-card{flex-basis:88%;width:88%;min-width:88%}.promo-heading{margin-right:14px;margin-left:14px}.promo-track{padding-right:14px;padding-left:14px}}
