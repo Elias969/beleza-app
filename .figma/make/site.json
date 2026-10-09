@@ -1,0 +1,10 @@
+{
+  "description": "This web application allows users to create and customize prototypes based on uploaded images, streamlining the design process for developers and designers.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
