@@ -246,10 +246,13 @@ function Home({ c }: { c: Ctx }) {
   return (
     <>
       <header className="hero">
-        <p>Olá! 👋</p>
-        <h1>Beleza Segura</h1>
-        <span>Compre com confiança em links oficiais.</span>
-      </header>
+  <p>Olá! 👋</p>
+  <div className="hero-brand">
+    <img className="brand-logo" src="/assets/LOGOICON.png" alt="" aria-hidden="true" />
+    <h1>Beleza Segura</h1>
+  </div>
+  <span>Compre com confiança em links oficiais.</span>
+</header>
       <div className="search-bar"><Icons.Search /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Busque produtos verificados..." aria-label="Buscar" /></div>
       <ImageCarousel slides={HOME_SLIDES} variant="home" />
       <div className="chips">{CATS.map((k) => <button key={k} className={cat === k ? "chip on" : "chip"} onClick={() => setCat(k)}>{CAT_EMOJI[k]} {k}</button>)}</div>
@@ -433,7 +436,13 @@ function Auth({ mode, setMode, onAuth }: { mode: "login" | "signup"; setMode: (m
       <div className="login-decoration login-decoration-right" aria-hidden="true">
         <svg viewBox="0 0 180 170"><path d="M170 25c-37-20-75-15-108 0 29 25 66 35 108 0Z"/><path d="M158 35c-20 20-45 37-78 52"/><path d="M174 83c-32-15-60-9-84 10 29 17 58 14 84-10Z"/><path d="M162 88c-23 3-44 10-65 25"/></svg>
       </div>
-      <div className="auth-top"><h1>Beleza Segura</h1><p>{mode === "login" ? "Bem-vinda de volta!" : "Crie sua conta"}</p></div>
+      <div className="auth-top">
+  <div className="auth-brand">
+    
+    <h1>Beleza Segura</h1> <img className="brand-logo" src="/assets/LOGOICON.png" alt="" aria-hidden="true" />
+  </div>
+  <p>{mode === "login" ? "Bem-vinda de volta!" : "Crie sua conta"}</p>
+</div>
       <div className="auth-sheet slide-up">
         {mode === "signup" && <input className="input" placeholder="Nome" value={name} onChange={(e) => setName(e.target.value)} />}
         <input className="input" type="email" placeholder="E-mail" value={email} onChange={(e) => setEmail(e.target.value)} />
