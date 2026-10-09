@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import "./index.css";
 
 /* ================= Tipos ================= */
 export type Screen = "login" | "signup" | "home" | "detail" | "verifier" | "discover" | "community" | "profile";
@@ -9,6 +10,7 @@ export interface Product {
 }
 interface Post { id: number; author: string; tag: "Alerta" | "Dica" | "Pergunta"; time: string; text: string; likes: number; liked: boolean; comments: string[] }
 interface User { name: string; email: string }
+interface BannerSlide { label: string; title: string; text: string; image: string }
 
 /* ================= Dados =================
  * IMAGENS: troque o campo `image` pela foto oficial do produto
@@ -45,6 +47,18 @@ const SEED_POSTS: Post[] = [
   { id: 1, author: "Marina Ramos", tag: "Alerta", time: "Há 2 horas", text: "Recebi no zap uma “promoção de perfume” e era golpe! Usei o verificador e o domínio não era oficial. Fiquem de olho!", likes: 42, liked: false, comments: ["Obrigada pelo aviso!", "Aconteceu comigo semana passada."] },
   { id: 2, author: "Camila Souza", tag: "Dica", time: "Ontem", text: "O sérum Botik com ácido hialurônico vale cada centavo. Pele bem mais hidratada na primeira semana.", likes: 128, liked: false, comments: ["Vou comprar!"] },
   { id: 3, author: "Rafael Lima", tag: "Pergunta", time: "2 dias", text: "Alguém sabe se o Malbec Gold dura bastante na pele? Quero presentear meu pai.", likes: 17, liked: false, comments: [] },
+];
+
+const HOME_SLIDES: BannerSlide[] = [
+  { label: "BELEZA COM CONFIANÇA", title: "Seu próximo favorito, com segurança", text: "Confira a loja e o link antes de comprar.", image: U("photo-1594035910387-fea47794261f") },
+  { label: "CUIDADO QUE VOCÊ MERECE", title: "Encontre seu ritual de skincare", text: "Descubra produtos e ofertas em um só lugar.", image: U("photo-1620916566398-39f1143ab7be") },
+  { label: "ESCOLHAS SEGURAS", title: "Beleza boa é beleza protegida", text: "Salve seus achados e compre com mais tranquilidade.", image: U("photo-1608248543803-ba4f8c70ae0b") },
+];
+
+const COMMUNITY_SLIDES: BannerSlide[] = [
+  { label: "COMUNIDADE BELEZA SEGURA", title: "Informação compartilhada protege todo mundo", text: "Conte sua experiência e ajude outras pessoas a comprar com atenção.", image: U("photo-1595425970377-c9703c518815") },
+  { label: "DICA DA COMUNIDADE", title: "Confira o endereço antes de pagar", text: "Desconfie de promoções boas demais e de links encurtados.", image: U("photo-1592945403244-b3fbafd7f539") },
+  { label: "JUNTAS CONTRA GOLPES", title: "Um alerta pode fazer a diferença", text: "Compartilhe dicas, dúvidas e sinais de atenção.", image: U("photo-1585386959984-a4155224a1ad") },
 ];
 
 /* ================= Ícones (stroke + currentColor) ================= */
@@ -91,9 +105,27 @@ function checkLink(raw: string) {
   items.push(url.protocol === "https:" ? { s: "ok", t: "Conexão criptografada (HTTPS)", d: "O endereço usa HTTPS." } : { s: "bad", t: "Sem HTTPS", d: "Nunca insira dados em sites sem cadeado." });
   items.push(official ? { s: "ok", t: "Domínio oficial reconhecido", d: `${host} está na lista de lojas verificadas.` } : brandFake ? { s: "bad", t: "Imita uma marca conhecida", d: "O nome da marca aparece em um domínio que não é o oficial." } : { s: "warn", t: "Domínio não verificado", d: "Não está na nossa lista de lojas oficiais." });
   items.push(BAD_TLD.includes(tld) ? { s: "bad", t: `Extensão suspeita (.${tld})`, d: "Muito usada em sites de golpe." } : { s: "ok", t: "Extensão comum", d: `.${tld} não é considerada de alto risco.` });
-  items.push(SHORT.includes(host) ? { s: "bad", t: "Link encurtado", d: "Esconde o destino real. Evite." } : /^\d+\.\d+\.\d+\.\d+$/.test(host) || raw.includes("@") ? { s: "bad", t: "Endereço estranho", d: "IP direto ou caractere @ na URL." } : { s: "ok", t: "Estrutura do link normal", d: "Sem encurtadores ou truques." });
-  const score = Math.max(5, 100 - items.reduce((a, i) => a + (i.s === "bad" ? 35 : i.s === "warn" ? 15 : 0), 0));
+  const isShortLink = SHORT.includes(host);
+  items.push(isShortLink ? { s: "bad", t: "Link encurtado", d: "Esconde o destino real. Evite." } : /^\d+\.\d+\.\d+\.\d+$/.test(host) || raw.includes("@") ? { s: "bad", t: "Endereço estranho", d: "IP direto ou caractere @ na URL." } : { s: "ok", t: "Estrutura do link normal", d: "Sem encurtadores ou truques." });
+  const score = Math.max(5, 100 - items.reduce((a, i) => a + (i.s === "bad" ? 35 : i.s === "warn" ? 15 : 0), 0) - (isShortLink ? 15 : 0));
   return { host, score, items };
+}
+
+function getLinkStories(host: string, score: number) {
+  const normalized = host.toLowerCase().replace(/^www\./, "");
+  const official = OFFICIAL.some((domain) => normalized === domain || normalized.endsWith("." + domain));
+  if (official && score >= 80) return [
+    "Exemplo de relato: usei o endereço da loja oficial e meu pedido chegou certinho.",
+    "Dica da comunidade: confira se o domínio termina exatamente no endereço oficial.",
+  ];
+  if (SHORT.includes(normalized)) return [
+    "Alerta de demonstração: o link encurtado não mostra o destino. Peça o endereço original antes de clicar.",
+    "Não é possível confirmar compras ou entregas usando apenas um link encurtado.",
+  ];
+  return [
+    "Exemplo de alerta: a oferta parecia boa demais e o endereço não era o site oficial.",
+    "Dica de segurança: não informe dados nem faça Pix antes de confirmar a loja por um canal oficial.",
+  ];
 }
 
 /* ================= Componentes ================= */
@@ -140,6 +172,30 @@ function ProductCard({ p, c, wide }: { p: Product; c: Ctx; wide?: boolean }) {
   );
 }
 
+function ImageCarousel({ slides, variant }: { slides: BannerSlide[]; variant: "home" | "community" }) {
+  const [active, setActive] = useState(0);
+  useEffect(() => {
+    const timer = window.setInterval(() => setActive((current) => (current + 1) % slides.length), 5200);
+    return () => window.clearInterval(timer);
+  }, [slides.length]);
+  const slide = slides[active];
+  const move = (direction: number) => setActive((current) => (current + direction + slides.length) % slides.length);
+  return (
+    <section className={`image-carousel ${variant}`} aria-roledescription="carrossel" aria-label={variant === "home" ? "Destaques da página inicial" : "Destaques da comunidade"}>
+      <img key={slide.image} className="carousel-image" src={slide.image} alt="" />
+      <div className="carousel-overlay" />
+      <div className="carousel-copy" aria-live="polite">
+        <span>{slide.label}</span><h2>{slide.title}</h2><p>{slide.text}</p>
+      </div>
+      <button className="carousel-arrow prev" onClick={() => move(-1)} aria-label="Banner anterior">‹</button>
+      <button className="carousel-arrow next" onClick={() => move(1)} aria-label="Próximo banner">›</button>
+      <div className="carousel-dots" role="tablist" aria-label="Selecionar banner">
+        {slides.map((item, index) => <button key={item.title} className={index === active ? "active" : ""} onClick={() => setActive(index)} aria-label={`Banner ${index + 1}`} aria-selected={index === active} role="tab" />)}
+      </div>
+    </section>
+  );
+}
+
 function Home({ c }: { c: Ctx }) {
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<"Todos" | Cat>("Todos");
@@ -153,6 +209,7 @@ function Home({ c }: { c: Ctx }) {
         <span>Compre com confiança em links oficiais.</span>
       </header>
       <div className="search-bar"><Icons.Search /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Busque produtos verificados..." aria-label="Buscar" /></div>
+      <ImageCarousel slides={HOME_SLIDES} variant="home" />
       <div className="chips">{CATS.map((k) => <button key={k} className={cat === k ? "chip on" : "chip"} onClick={() => setCat(k)}>{CAT_EMOJI[k]} {k}</button>)}</div>
       {!q && cat === "Todos" && (
         <section className="block">
@@ -225,12 +282,17 @@ function Verifier({ c }: { c: Ctx }) {
       <div className="card">
         <input className="input" value={link} onChange={(e) => setLink(e.target.value)} onKeyDown={(e) => e.key === "Enter" && run()} placeholder="https://loja.com.br/produto" aria-label="Link" />
         <button className="btn-primary w-full" disabled={busy} onClick={run}>{busy ? "Analisando..." : "Verificar link"}</button>
-        <div className="try"><small>Testar:</small>{["https://www.boticario.com.br/", "http://boticario-ofertas.xyz/perfume", "bit.ly/promo123"].map((x) => <button key={x} onClick={() => setLink(x)}>{x.replace(/^https?:\/\//, "").slice(0, 22)}</button>)}</div>
+        <div className="try"><small>Testar:</small>{["https://www.oboticario.com.br/", "http://boticario-ofertas.xyz/perfume", "https://bit.ly/promo123"].map((x) => <button key={x} onClick={() => setLink(x)}>{x.replace(/^https?:\/\//, "").slice(0, 22)}</button>)}</div>
       </div>
       {busy && <div className="card center"><div className="spinner" /></div>}
       {res && (
-        <div className="card slide-up">
+        <div className="card slide-up verifier-result">
           <div className="score-head"><div className={"score " + tone}>{res.score}</div><div><h3>{verdict}</h3><p className="muted">{res.host}</p></div></div>
+          <div className={`beauty-score ${tone}`}>
+            <div className="beauty-score-label"><span>Beleza Segura Score</span><strong>{res.score}<small>/100</small></strong></div>
+            <div className="beauty-score-track" role="progressbar" aria-label="Beleza Segura Score" aria-valuemin={0} aria-valuemax={100} aria-valuenow={res.score}><span style={{ width: `${res.score}%` }} /></div>
+            <p>{res.score >= 80 ? "Ótimo nível de confiança — confira o domínio antes de finalizar." : res.score >= 50 ? "Atenção: confira os sinais abaixo antes de continuar." : "Risco elevado — evite informar dados ou fazer pagamentos."}</p>
+          </div>
           {res.items.map((it, i) => (
             <div key={i} className="check" style={{ animationDelay: i * 90 + "ms" }}>
               <span className={"ci " + it.s}>{it.s === "ok" ? "✓" : it.s === "warn" ? "!" : "✕"}</span>
@@ -238,6 +300,11 @@ function Verifier({ c }: { c: Ctx }) {
             </div>
           ))}
           <p className="disc">Análise automática baseada no endereço. Não substitui seu bom senso.</p>
+          <section className="link-community" aria-label="Comentários demonstrativos da comunidade">
+            <div className="link-community-heading"><span>COMUNIDADE</span><h3>O que as pessoas comentam</h3></div>
+            <p className="demo-note">Exemplos ilustrativos para demonstração; não são avaliações reais nem confirmação de compras deste endereço.</p>
+            {getLinkStories(res.host, res.score).map((story, index) => <article className="link-story" key={index}><span className="story-avatar">{index === 0 ? "BS" : "D"}</span><p>{story}</p></article>)}
+          </section>
         </div>
       )}
     </>
@@ -265,6 +332,7 @@ function CommunityScreen({ c }: { c: Ctx }) {
   return (
     <>
       <header className="page-header"><span>FÓRUM SEGURO</span><h1>Comunidade</h1><p>Dicas e alertas de outros consumidores.</p></header>
+      <ImageCarousel slides={COMMUNITY_SLIDES} variant="community" />
       {posts.map((p) => (
         <div key={p.id} className="card post slide-up">
           <div className="phead"><div className="avatar">{p.author.split(" ").map((w) => w[0]).slice(0, 2).join("")}</div><div><strong>{p.author}</strong><span>{p.time}</span></div><em className={"tagp " + p.tag}>{p.tag}</em></div>
@@ -320,6 +388,12 @@ function Auth({ mode, setMode, onAuth }: { mode: "login" | "signup"; setMode: (m
   };
   return (
     <main className="auth">
+      <div className="login-decoration login-decoration-left" aria-hidden="true">
+        <svg viewBox="0 0 180 150"><path d="M8 24C43 1 78 4 111 18 83 42 48 54 8 24Z"/><path d="M20 35c20 18 44 34 76 49"/><path d="M12 80c30-15 57-10 81 7-27 18-55 16-81-7Z"/><path d="M22 84c21 3 40 9 61 22"/></svg>
+      </div>
+      <div className="login-decoration login-decoration-right" aria-hidden="true">
+        <svg viewBox="0 0 180 170"><path d="M170 25c-37-20-75-15-108 0 29 25 66 35 108 0Z"/><path d="M158 35c-20 20-45 37-78 52"/><path d="M174 83c-32-15-60-9-84 10 29 17 58 14 84-10Z"/><path d="M162 88c-23 3-44 10-65 25"/></svg>
+      </div>
       <div className="auth-top"><h1>Beleza Segura</h1><p>{mode === "login" ? "Bem-vinda de volta!" : "Crie sua conta"}</p></div>
       <div className="auth-sheet slide-up">
         {mode === "signup" && <input className="input" placeholder="Nome" value={name} onChange={(e) => setName(e.target.value)} />}
@@ -360,7 +434,6 @@ export default function App() {
 
   return (
     <div className="app-wrapper">
-      <GlobalStyles />
       <div className="mobile-container">
         {!user ? <Auth mode={authMode} setMode={setAuthMode} onAuth={auth} /> : (
           <>
@@ -373,6 +446,7 @@ export default function App() {
     </div>
   );
 }
+
 
 /* ================= Estilos ================= */
 function GlobalStyles() {
