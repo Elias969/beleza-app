@@ -703,7 +703,7 @@ body{background:#532b33}
 .auth-sheet{background:#e3d2cf;border-radius:40px 40px 0 0;padding:32px 26px}
 .auth-sheet .input{border:0;border-radius:40px;padding:16px 20px;background:#fff}
 .auth-sheet .input:focus{box-shadow:0 0 0 3px rgba(168,79,96,.16)}
-.auth-sheet .btn-primary{max-width:280px;margin:10px auto 0;padding:15px 24px}
+.auth-sheet .btn-primary{display:flex;width:100%;max-width:280px;margin:10px auto 0;padding:15px 24px}
 .switch{font-family:"Inter:Regular",Inter,sans-serif;color:#73686c}
 .switch button{color:#a84f60;font-family:"Poppins:SemiBold",Poppins,sans-serif}
 .err{font-family:"Inter:Regular",Inter,sans-serif}
