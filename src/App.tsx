@@ -321,18 +321,23 @@ function ImageCarousel({ slides, variant }: { slides: BannerSlide[]; variant: "h
     </section>
   );
 }
-
 function Home({ c }: { c: Ctx }) {
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<"Todos" | Cat>("Todos");
-  const list = useMemo(() => PRODUCTS.filter((p) => (cat === "Todos" || p.category === cat) && p.name.toLowerCase().includes(q.toLowerCase())), [q, cat]);
+
+  // Filtra normalmente com base na busca e categoria
+  const filteredList = useMemo(() => PRODUCTS.filter((p) => (cat === "Todos" || p.category === cat) && p.name.toLowerCase().includes(q.toLowerCase())), [q, cat]);
+  
+  // Limita a apenas 4 produtos quando não há busca ativa e a categoria selecionada é "Todos"
+  const list = useMemo(() => (!q && cat === "Todos") ? filteredList.slice(0, 4) : filteredList, [filteredList, q, cat]);
+
   const promos = PRODUCTS.filter((p) => off(p) > 0);
   return (
     <>
       <header className="hero">
-        <p>Olá! 👋</p>
+        <p>Olá! </p>
         <div className="hero-brand">
-          <img className="brand-logo" src="/assets/logo.png" alt="" aria-hidden="true" />
+          <img className="brand-logo" src="./assets/logo.png" alt="" aria-hidden="true" />
           <h1>Beleza Segura</h1>
         </div>
         <span>Compre com confiança em links oficiais.</span>
@@ -344,7 +349,7 @@ function Home({ c }: { c: Ctx }) {
         <PromoCarousel products={promos} c={c} />
       )}
       <section className="block">
-        <h2>{q || cat !== "Todos" ? `Resultados (${list.length})` : "Tendências seguras"}</h2>
+        <h2>{q || cat !== "Todos" ? `Resultados (${list.length})` : "Tendências do momento"}</h2>
         {list.length === 0 ? <p className="empty">Nada encontrado 😕<br />Tente outra busca.</p> : (
           <div className="grid">{list.map((p) => <ProductCard key={p.id} p={p} c={c} wide />)}</div>
         )}
@@ -358,7 +363,6 @@ function Home({ c }: { c: Ctx }) {
     </>
   );
 }
-
 function Discover({ c }: { c: Ctx }) {
   const [sort, setSort] = useState<"rating" | "low" | "high" | "off">("rating");
   const list = useMemo(() => [...PRODUCTS].sort((a, b) => sort === "rating" ? b.rating - a.rating : sort === "low" ? a.price - b.price : sort === "high" ? b.price - a.price : off(b) - off(a)), [sort]);
@@ -388,7 +392,7 @@ function Detail({ p, c }: { p: Product; c: Ctx }) {
         <div className="rate big"><Icons.Star /> {p.rating} <small>({p.reviews} avaliações)</small></div>
         <div className="dprice"><h2>{brl(p.price)}</h2>{p.oldPrice && <s>{brl(p.oldPrice)}</s>}{off(p) > 0 && <span className="discount">{off(p)}% OFF</span>}</div>
         <p className="ddesc">{p.description}</p>
-        <div className="security"><strong>🔒 Por que é seguro?</strong><p>O botão abaixo abre o endereço oficial da loja, em outra aba, sem intermediários. Confira sempre o cadeado e o domínio antes de pagar.</p></div>
+        <div className="security"><strong>🔒 Por que é Confiável?</strong><p>O botão abaixo abre o endereço oficial da loja, em outra aba, sem intermediários. Confira sempre o cadeado e o domínio antes de pagar.</p></div>
         <h3 className="sub">Você também pode gostar</h3>
         <div className="hscroll flush">{PRODUCTS.filter((x) => x.category === p.category && x.id !== p.id).slice(0, 4).map((x) => <ProductCard key={x.id} p={x} c={c} />)}</div>
       </div>
@@ -407,7 +411,7 @@ function Verifier({ c }: { c: Ctx }) {
     setTimeout(() => { const r = checkLink(link); setBusy(false); if (!r) c.toast("Link inválido"); setRes(r); }, 900);
   };
   const tone = res ? (res.score >= 80 ? "good" : res.score >= 50 ? "mid" : "bad") : "";
-  const verdict = res ? (res.score >= 80 ? "Parece seguro" : res.score >= 50 ? "Atenção" : "Alto risco") : "";
+  const verdict = res ? (res.score >= 80 ? "Confiável" : res.score >= 50 ? "Atenção" : "Alto risco") : "";
   return (
     <>
       <header className="page-header"><span>CENTRAL DE CONFIANÇA</span><h1>Verificador de Links</h1><p>Cole o link antes de comprar.</p></header>
@@ -468,7 +472,7 @@ function CommunityScreen({ c }: { c: Ctx }) {
   };
   return (
     <>
-      <header className="page-header"><span>FÓRUM SEGURO</span><h1>Comunidade</h1><p>Dicas e alertas de outros consumidores.</p></header>
+      <header className="page-header"><span>FÓRUM</span><h1>Comunidade</h1><p>Dicas e alertas de outros consumidores.</p></header>
       <ImageCarousel slides={COMMUNITY_SLIDES} variant="community" />
       {posts.map((p) => (
         <div key={p.id} className="card post slide-up">
@@ -533,7 +537,7 @@ function Auth({ mode, setMode, onAuth }: { mode: "login" | "signup"; setMode: (m
       </div>
       <div className="auth-top">
         <div className="auth-brand">
-          <img className="brand-logo" src="/assets/LOGOICON.png" alt="" aria-hidden="true" />
+         <img className="brand-logo" src="./assets/logo.png" alt="" aria-hidden="true" />
           <h1>Beleza Segura</h1>
         </div>
         <p>{mode === "login" ? "Bem-vinda de volta!" : "Crie sua conta"}</p>
