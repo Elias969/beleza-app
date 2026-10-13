@@ -332,7 +332,7 @@ function Home({ c }: { c: Ctx }) {
       <header className="hero">
         <p>Olá! 👋</p>
         <div className="hero-brand">
-          <img className="brand-logo" src="/assets/LOGOICON.png" alt="" aria-hidden="true" />
+          <img className="brand-logo" src="/assets/logo.png" alt="" aria-hidden="true" />
           <h1>Beleza Segura</h1>
         </div>
         <span>Compre com confiança em links oficiais.</span>
