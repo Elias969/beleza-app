@@ -61,6 +61,33 @@ const COMMUNITY_SLIDES: BannerSlide[] = [
   { label: "JUNTAS CONTRA GOLPES", title: "Um alerta pode fazer a diferença", text: "Compartilhe dicas, dúvidas e sinais de atenção.", image: U("photo-1585386959984-a4155224a1ad") },
 ];
 
+const PARTNER_STORES = [
+  { name: "Wella", initials: "W", image: "brand-wella.png" },
+  { name: "L'Oréal Paris", initials: "L", image: "brand-loreal.png" },
+  { name: "Saffron", initials: "S", image: "brand-saffron.png" },
+  { name: "The Body Shop", initials: "BS", image: "brand-body-shop.png" },
+  { name: "Dermacos", initials: "D", image: "brand-dermacos.png" },
+  { name: "Luscious Cosmetics", initials: "LC", image: "brand-luscious.png" },
+  { name: "Garnier", initials: "G", image: "brand-garnier.png" },
+  { name: "Lancôme", initials: "L", image: "brand-lancome.png" },
+  { name: "Maybelline", initials: "M", image: "brand-maybelline.png" },
+  { name: "PGM", initials: "PGM", image: "brand-pgm.png" },
+  { name: "Kryolan", initials: "K", image: "brand-kryolan.png" },
+  { name: "Braun", initials: "B", image: "brand-braun.png" },
+  { name: "Clinique", initials: "C", image: "brand-clinique.png" },
+  { name: "Diana of London", initials: "D", image: "brand-diana.png" },
+  { name: "Flormar", initials: "F", image: "brand-flormar.png" },
+  { name: "Versace", initials: "V", image: "brand-versace.png" },
+  { name: "MAC", initials: "MAC", image: "brand-mac.png" },
+  { name: "Janssen", initials: "J", image: "brand-janssen.png" },
+  { name: "Keune", initials: "K", image: "brand-keune.png" },
+  { name: "IFB", initials: "IFB", image: "brand-ifb.png" },
+  { name: "Christian Dior", initials: "D", image: "brand-dior.png" },
+  { name: "Triumph", initials: "T", image: "brand-triumph.png" },
+  { name: "G3", initials: "G3", image: "brand-g3.png" },
+  { name: "Golden Rose", initials: "GR", image: "brand-golden-rose.png" },
+];
+
 /* ================= Ícones (stroke + currentColor) ================= */
 const I = (p: { d: string | string[]; fill?: string; size?: number }) => (
   <svg viewBox="0 0 24 24" width={p.size || 24} height={p.size || 24} fill={p.fill || "none"} stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -115,16 +142,16 @@ function getLinkStories(host: string, score: number) {
   const normalized = host.toLowerCase().replace(/^www\./, "");
   const official = OFFICIAL.some((domain) => normalized === domain || normalized.endsWith("." + domain));
   if (official && score >= 80) return [
-    "Exemplo de relato: usei o endereço da loja oficial e meu pedido chegou certinho.",
-    "Dica da comunidade: confira se o domínio termina exatamente no endereço oficial.",
+    { author: "Maria Luisa", initials: "ML", text: "Adorei esse site! Achei o que procurava rapidinho e conferi que o endereço é o oficial." },
+    { author: "Camila R.", initials: "CR", text: "Boa experiência para navegar. Eu sempre confiro o domínio antes de comprar — esse corresponde à loja oficial." },
   ];
   if (SHORT.includes(normalized)) return [
-    "Alerta de demonstração: o link encurtado não mostra o destino. Peça o endereço original antes de clicar.",
-    "Não é possível confirmar compras ou entregas usando apenas um link encurtado.",
+    { author: "Ana Paula", initials: "AP", text: "Não consegui ver para onde esse link leva. Vou pedir o endereço completo antes de abrir." },
+    { author: "Juliana M.", initials: "JM", text: "Melhor confirmar o destino pelo site oficial antes de informar qualquer dado." },
   ];
   return [
-    "Exemplo de alerta: a oferta parecia boa demais e o endereço não era o site oficial.",
-    "Dica de segurança: não informe dados nem faça Pix antes de confirmar a loja por um canal oficial.",
+    { author: "Beatriz S.", initials: "BS", text: "Ainda não reconheço esse endereço. Vou conferir o domínio pelo canal oficial antes de continuar." },
+    { author: "Renata C.", initials: "RC", text: "Fiquei com dúvida sobre esse link. Não vou informar dados nem fazer pagamento sem confirmar a loja." },
   ];
 }
 
@@ -214,6 +241,63 @@ function PromoCarousel({ products, c }: { products: Product[]; c: Ctx }) {
   );
 }
 
+function PartnerCard({ partner }: { partner: (typeof PARTNER_STORES)[number] }) {
+  const [imageFailed, setImageFailed] = useState(false);
+  return (
+    <article className="partner-card">
+      <div className="partner-logo-wrapper">
+        {!imageFailed ? (
+          <img
+            className="partner-logo"
+            src={`/assets/${partner.image}`}
+            alt=""
+            aria-hidden="true"
+            loading="lazy"
+            onError={() => setImageFailed(true)}
+          />
+        ) : <span className="partner-initials" aria-hidden="true">{partner.initials}</span>}
+      </div>
+      <span>{partner.name}</span>
+    </article>
+  );
+}
+
+function PartnersCarousel() {
+  return (
+    <section className="partners-section" aria-label="Marcas parceiras">
+      <div className="partners-heading">
+        <span>PARCERIAS DE BELEZA</span>
+        <h2>Marcas parceiras <span aria-hidden="true">🤝</span></h2>
+        <p>Descubra marcas queridas pela comunidade.</p>
+      </div>
+      <div className="partners-marquee" aria-label="Carrossel contínuo de marcas parceiras">
+        <div className="partners-track">
+          <div className="partners-group">
+            {PARTNER_STORES.map((partner) => <PartnerCard key={partner.name} partner={partner} />)}
+          </div>
+          <div className="partners-group" aria-hidden="true">
+            {PARTNER_STORES.map((partner) => <PartnerCard key={`loop-${partner.name}`} partner={partner} />)}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function CommunityInvite({ onOpen }: { onOpen: () => void }) {
+  return (
+    <section className="community-invite" aria-labelledby="community-invite-title">
+      <div className="community-invite-icon" aria-hidden="true"><Icons.Community /></div>
+      <span className="community-invite-kicker">BELEZA SEGURA, JUNTAS</span>
+      <h2 id="community-invite-title">Uma dica sua pode ajudar alguém.</h2>
+      <p>Troque experiências, compartilhe alertas e descubra recomendações de outras pessoas.</p>
+      <button className="community-invite-button" onClick={onOpen}>
+        Venha conferir nossa comunidade! <span aria-hidden="true">→</span>
+      </button>
+    </section>
+  );
+}
+
 function ImageCarousel({ slides, variant }: { slides: BannerSlide[]; variant: "home" | "community" }) {
   const [active, setActive] = useState(0);
   useEffect(() => {
@@ -246,13 +330,13 @@ function Home({ c }: { c: Ctx }) {
   return (
     <>
       <header className="hero">
-  <p>Olá! 👋</p>
-  <div className="hero-brand">
-    <img className="brand-logo" src="/assets/logo.png" alt="" aria-hidden="true" />
-    <h1>Beleza Segura</h1>
-  </div>
-  <span>Compre com confiança em links oficiais.</span>
-</header>
+        <p>Olá! 👋</p>
+        <div className="hero-brand">
+          <img className="brand-logo" src="/assets/LOGOICON.png" alt="" aria-hidden="true" />
+          <h1>Beleza Segura</h1>
+        </div>
+        <span>Compre com confiança em links oficiais.</span>
+      </header>
       <div className="search-bar"><Icons.Search /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Busque produtos verificados..." aria-label="Buscar" /></div>
       <ImageCarousel slides={HOME_SLIDES} variant="home" />
       <div className="chips">{CATS.map((k) => <button key={k} className={cat === k ? "chip on" : "chip"} onClick={() => setCat(k)}>{CAT_EMOJI[k]} {k}</button>)}</div>
@@ -265,6 +349,12 @@ function Home({ c }: { c: Ctx }) {
           <div className="grid">{list.map((p) => <ProductCard key={p.id} p={p} c={c} wide />)}</div>
         )}
       </section>
+      {!q && cat === "Todos" && (
+        <>
+          <PartnersCarousel />
+          <CommunityInvite onOpen={() => c.go("community")} />
+        </>
+      )}
     </>
   );
 }
@@ -345,7 +435,12 @@ function Verifier({ c }: { c: Ctx }) {
           <section className="link-community" aria-label="Comentários demonstrativos da comunidade">
             <div className="link-community-heading"><span>COMUNIDADE</span><h3>O que as pessoas comentam</h3></div>
             <p className="demo-note">Exemplos ilustrativos para demonstração; não são avaliações reais nem confirmação de compras deste endereço.</p>
-            {getLinkStories(res.host, res.score).map((story, index) => <article className="link-story" key={index}><span className="story-avatar">{index === 0 ? "BS" : "D"}</span><p>{story}</p></article>)}
+            {getLinkStories(res.host, res.score).map((story) => (
+              <article className="link-story" key={story.author}>
+                <span className="story-avatar" aria-hidden="true">{story.initials}</span>
+                <p><strong>{story.author}:</strong> {story.text}</p>
+              </article>
+            ))}
           </section>
         </div>
       )}
@@ -437,12 +532,12 @@ function Auth({ mode, setMode, onAuth }: { mode: "login" | "signup"; setMode: (m
         <svg viewBox="0 0 180 170"><path d="M170 25c-37-20-75-15-108 0 29 25 66 35 108 0Z"/><path d="M158 35c-20 20-45 37-78 52"/><path d="M174 83c-32-15-60-9-84 10 29 17 58 14 84-10Z"/><path d="M162 88c-23 3-44 10-65 25"/></svg>
       </div>
       <div className="auth-top">
-  <div className="auth-brand">
-    
-    <h1>Beleza Segura</h1> <img className="brand-logo" src="/assets/logo.png" alt="" aria-hidden="true" />
-  </div>
-  <p>{mode === "login" ? "Bem-vinda de volta!" : "Crie sua conta"}</p>
-</div>
+        <div className="auth-brand">
+          <img className="brand-logo" src="/assets/LOGOICON.png" alt="" aria-hidden="true" />
+          <h1>Beleza Segura</h1>
+        </div>
+        <p>{mode === "login" ? "Bem-vinda de volta!" : "Crie sua conta"}</p>
+      </div>
       <div className="auth-sheet slide-up">
         {mode === "signup" && <input className="input" placeholder="Nome" value={name} onChange={(e) => setName(e.target.value)} />}
         <input className="input" type="email" placeholder="E-mail" value={email} onChange={(e) => setEmail(e.target.value)} />
