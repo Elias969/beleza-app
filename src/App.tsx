@@ -547,7 +547,15 @@ function Auth({ mode, setMode, onAuth, onGuest }: { mode: "login" | "signup"; se
         <input className="input" type="email" placeholder="E-mail" value={email} onChange={(e) => setEmail(e.target.value)} />
         <input className="input" type="password" placeholder="Senha" value={pw} onChange={(e) => setPw(e.target.value)} onKeyDown={(e) => e.key === "Enter" && submit()} />
         {err && <p className="err" role="alert">{err}</p>}
-        <button className="btn-primary w-full" onClick={submit}>{mode === "login" ? "Entrar" : "Cadastrar"}</button>
+        <button className="btn-primary w-full" onClick={submit}>{mode === "login" ? "Entrar" : "Cadastrar"}</button> 
+    
+<button
+  type="button"
+  className="guest-entry"
+  onClick={onGuest}
+>
+  Entrar sem login
+</button>
         <p className="switch">{mode === "login" ? "Não tem conta? " : "Já tem conta? "}<button onClick={() => { setErr(""); setMode(mode === "login" ? "signup" : "login"); }}>{mode === "login" ? "Cadastre-se" : "Entrar"}</button></p>
       </div>
     </main>
