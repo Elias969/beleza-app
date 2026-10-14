@@ -578,6 +578,10 @@ export default function App() {
   const c: Ctx = { favs, toggleFav, go, toast: setMsg };
   const auth = (u: User) => { save("bs_user", u); setUser(u); setScreen("home"); };
   const logout = () => { save("bs_user", null); setUser(null); };
+  const enterGuest = () => {
+  setUser({ name: "Visitante", email: "Acesso sem conta" });
+  setScreen("home");
+};
 
   let body: React.ReactNode;
   if (screen === "detail" && product) body = <Detail p={product} c={c} />;
@@ -590,7 +594,7 @@ export default function App() {
   return (
     <div className="app-wrapper">
       <div className="mobile-container">
-        {!user ? <Auth mode={authMode} setMode={setAuthMode} onAuth={auth} /> : (
+        {!user ? <Auth mode={authMode} setMode={setAuthMode} onAuth={auth} onGuest={enterGuest} /> : (
           <>
             <div id="scroller" className="scroller"><div key={screen} className="screen fade-in">{body}</div></div>
             {screen !== "detail" && <BottomNav active={screen} go={go} />}
