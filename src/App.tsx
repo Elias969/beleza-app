@@ -519,7 +519,7 @@ function ProfileScreen({ c, user, logout }: { c: Ctx; user: User; logout: () => 
   );
 }
 
-function Auth({ mode, setMode, onAuth }: { mode: "login" | "signup"; setMode: (m: "login" | "signup") => void; onAuth: (u: User) => void }) {
+function Auth({ mode, setMode, onAuth, onGuest }: { mode: "login" | "signup"; setMode: (m: "login" | "signup") => void; onAuth: (u: User) => void; onGuest: () => void; }) {
   const [name, setName] = useState(""); const [email, setEmail] = useState(""); const [pw, setPw] = useState(""); const [err, setErr] = useState("");
   const submit = () => {
     if (mode === "signup" && name.trim().length < 2) return setErr("Informe seu nome.");
